@@ -1,55 +1,30 @@
-# Polynomial Addition using Linked List
+# Enter Polynomial 1
+p1 = {}
 
-class Node:
-    def __init__(self, coeff, power):
-        self.coeff = coeff
-        self.power = power
-        self.next = None
+n = int(input("Enter number of terms in Polynomial 1: "))
+for i in range(n):
+    power = int(input("Enter power: "))
+    coefficient = int(input("Enter coefficient: "))
+    p1[power] = coefficient
 
+# Enter Polynomial 2
+p2 = {}
+n = int(input("\nEnter number of terms in Polynomial 2: "))
+for i in range(n):
+    power = int(input("Enter power: "))
+    coefficient = int(input("Enter coefficient: "))
+    p2[power] = coefficient
 
-def add_polynomial(p1, p2):
-    result = []
-    i = 0
-    j = 0
+# Add the polynomials
+result = p1.copy()
+for power in p2:
+    if power in result:
+        result[power] = result[power] + p2[power]
+    else:
+        result[power] = p2[power]
 
-    while i < len(p1) and j < len(p2):
+# Display result
+print("\nResult:")
+for power in sorted(result, reverse=True):
+    print(result[power], "x^", power, end=" + ")
 
-        if p1[i][1] == p2[j][1]:
-            coeff = p1[i][0] + p2[j][0]
-
-            if coeff != 0:
-                result.append((coeff, p1[i][1]))
-
-            i += 1
-            j += 1
-
-        elif p1[i][1] > p2[j][1]:
-            result.append(p1[i])
-            i += 1
-
-        else:
-            result.append(p2[j])
-            j += 1
-
-    while i < len(p1):
-        result.append(p1[i])
-        i += 1
-
-    while j < len(p2):
-        result.append(p2[j])
-        j += 1
-
-    return result
-
-
-# Input
-p1 = [(5, 3), (4, 2), (2, 0)]
-p2 = [(3, 3), (2, 1), (7, 0)]
-
-# Addition
-answer = add_polynomial(p1, p2)
-
-# Output
-print("Polynomial 1:", p1)
-print("Polynomial 2:", p2)
-print("Result:", answer)
