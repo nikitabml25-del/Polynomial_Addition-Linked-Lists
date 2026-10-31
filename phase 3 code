@@ -1,0 +1,180 @@
+class Node:
+    def __init__(self, coeff, power):
+        self.coeff = coeff
+        self.power = power
+        self.next = None
+
+
+def insert(poly, coeff, power):
+    if coeff == 0:
+        return poly
+
+    dummy = Node(0, 0)
+    dummy.next = poly
+    prev, cur = dummy, poly
+
+    while cur and cur.power > power:
+        prev, cur = cur, cur.next
+
+    if cur and cur.power == power:
+        cur.coeff += coeff
+        if cur.coeff == 0:
+            prev.next = cur.next
+    else:
+        node = Node(coeff, power)
+        node.next = cur
+        prev.next = node
+
+   
+
+
+ return dummy.next
+
+
+def input_poly():
+    poly = None
+    n = int(input("Enter number of terms: "))
+
+    for _ in range(n):
+        c = int(input("Enter coefficient: "))
+        p = int(input("Enter power: "))
+        if p < 0:
+            raise ValueError("Power must be non-negative.")
+        poly = insert(poly, c, p)
+
+    return poly
+
+
+def combine(a, b, operation):
+    result = None
+
+    while a:
+        result = insert(result, a.coeff, a.power)
+        a = a.next
+
+    while b:
+        c = b.coeff
+        if operation == "-":
+            c = -c
+        result = insert(result, c, b.power)
+        b = b.next
+
+    return result
+
+
+def multiply(a, b):
+    result = None
+    while a:
+        cur = b
+        while cur:
+            result = insert(
+                result,
+                a.coeff * cur.coeff,
+                a.power + cur.power
+            )
+            cur = cur.next
+        a = a.next
+    return result
+
+
+def divide(a, b):
+    if b is None:
+        raise ZeroDivisionError("Cannot divide by zero polynomial.")
+
+    quotient = None
+    remainder = None
+
+    while a:
+        remainder = insert(remainder, a.coeff, a.power)
+        a = a.next
+
+    while remainder and remainder.power >= b.power:
+        power = remainder.power - b.power
+        coeff = remainder.coeff / b.coeff
+
+        quotient = insert(quotient, coeff, power)
+
+        cur = b
+        while cur:
+            remainder = insert(
+                remainder, -coeff * cur.coeff,
+                cur.power + power
+            )
+            cur = cur.next
+
+    
+
+
+
+
+return quotient, remainder
+
+def display(poly):
+    if poly is None:
+        return "0"
+
+    terms = []
+    while poly:
+        c, p = poly.coeff, poly.power
+        number = abs(c)
+        number = int(number) if number == int(number) else number
+
+        if p == 0:
+            term = str(number)
+        elif p == 1:
+            term = ("" if number == 1 else str(number)) + "x"
+        else:
+            term = ("" if number == 1 else str(number)) + f"x^{p}"
+
+        if not terms:
+            terms.append(("-" if c < 0 else "") + term)
+        else:
+            terms.append((" - " if c < 0 else " + ") + term)
+
+        poly = poly.next
+
+    return "".join(terms)
+
+
+try:
+    count = int(input("How many polynomials? "))
+    if count < 2:
+        raise ValueError("Enter at least two polynomials.")
+
+    polynomials = []
+
+    for i in range(count):
+        print(f"\nEnter Polynomial {i + 1}:")
+        polynomials.append(input_poly())
+
+    print("\nChoose operation:")
+    print("+ Addition")
+    print("- Subtraction")
+    print("* Multiplication")
+    print("/ Division")
+
+    op = input("Enter operator: ")
+
+    if op not in ["+", "-", "*", "/"]:
+        raise ValueError("Invalid operator.")
+
+    result = polynomials[0]
+
+    for poly in polynomials[1:]:
+        if op == "+" or op == "-":
+            result = combine(result, poly, op)
+        elif op == "*":
+            result = multiply(result, poly)
+        else:
+            result, remainder = divide(result, poly)
+
+    print("\nResult:", display(result))
+
+    if op == "/":
+        print("Remainder:", display(remainder))
+
+except (ValueError, ZeroDivisionError) as e:
+    print("Error:", e)
+
+
+        
